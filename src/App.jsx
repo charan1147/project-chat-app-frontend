@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import {
   BrowserRouter as Router,
-  Route,
   Routes,
+  Route,
   Navigate,
 } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";

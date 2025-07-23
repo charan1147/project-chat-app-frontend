@@ -8,11 +8,16 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsLoading(false); // No token, no need to fetch
+      return;
+    }
+
     async function fetchUser() {
       try {
         const res = await api.getMe();
-        console.log("getMe response:", res.data); // Debug
-        setUser(res.data.user);
+        setUser(res.data.user); // or res.data if your API returns plain user
       } catch (err) {
         console.error("Auth check error:", err.response?.data || err.message);
         setUser(null);
@@ -20,16 +25,16 @@ export function AuthProvider({ children }) {
         setIsLoading(false);
       }
     }
+
     fetchUser();
   }, []);
 
   const login = async (email, password) => {
     const res = await api.login(email, password);
-    console.log("AuthContext login response:", res); // Debug
     if (res.user) {
+      localStorage.setItem("token", res.token);
       setUser(res.user);
     } else {
-      console.error("No user data in login response:", res);
       throw new Error("Invalid login response: missing user data");
     }
     return res;
@@ -41,6 +46,7 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.error("Logout failed:", err.response?.data || err.message);
     } finally {
+      localStorage.removeItem("token");
       setUser(null);
     }
   };
