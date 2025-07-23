@@ -6,11 +6,31 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Interceptor to add JWT token to headers
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export default {
   getMe: () => api.get("/users/me"),
-  login: (email, password) => api.post("/auth/login", { email, password }),
-  register: (name, email, password) =>
-    api.post("/auth/register", { name, email, password }),
+  login: async (email, password) => {
+    const res = await api.post("/auth/login", { email, password });
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+    return res.data;
+  },
+  register: async (name, email, password) => {
+    const res = await api.post("/auth/register", { name, email, password });
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+    return res.data;
+  },
   getContacts: () => api.get("/users/contacts"),
   addContact: (email) => api.post("/users/add-contact", { email }),
   getMessages: (contactId) => api.get(`/messages/${contactId}`),
@@ -21,7 +41,10 @@ export default {
   answerCall: (roomId, signalData) =>
     api.post("/call/answer", { roomId, signalData }),
   endCall: (roomId) => api.post("/call/end", { roomId }),
-  logout: () => api.post("/auth/logout"),
+  logout: () => {
+    localStorage.removeItem("token");
+    return api.post("/auth/logout");
+  },
 };
 
 export function getRoomId(user1, user2) {

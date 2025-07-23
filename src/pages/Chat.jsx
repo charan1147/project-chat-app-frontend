@@ -4,7 +4,6 @@ import { ChatContext } from "../context/ChatContext.jsx";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { CallContext } from "../context/CallContext.jsx";
 import api from "../services/api.js";
-import socket from "../websocket/Socket.js";
 import ChatBox from "../components/Chat/ChatBox.jsx";
 import useWebSocket from "../hooks/useWebSocket.jsx";
 
@@ -21,7 +20,9 @@ export default function Chat() {
       try {
         const res = await api.getMessages(contactId);
         setMessages(res.data.messages || []);
-      } catch {}
+      } catch {
+        console.error("Failed to fetch messages");
+      }
     }
     if (contactId) {
       setSelectedContact({ _id: contactId });
@@ -42,24 +43,23 @@ export default function Chat() {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-    await api.sendMessage(contactId, input);
-    const msg = {
-      _id: Date.now().toString(),
-      sender: { _id: user._id, name: user.name || user.email },
-      receiver: contactId,
-      content: input,
-      type: "text",
-      createdAt: new Date(),
-    };
-    setMessages((prev) => [...prev, msg]);
-    socket.emit("sendMessage", {
-      senderId: user._id,
-      receiverId: contactId,
-      content: input,
-      type: "text",
-      senderName: user.name || user.email, // Include senderName for consistency
-    });
-    setInput("");
+    try {
+      const res = await api.sendMessage(contactId, input);
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: res.data._id || Date.now().toString(),
+          sender: { _id: user._id, name: user.name || user.email },
+          receiver: contactId,
+          content: input,
+          type: "text",
+          createdAt: new Date(),
+        },
+      ]);
+      setInput("");
+    } catch {
+      console.error("Failed to send message");
+    }
   };
 
   const handleStartCall = (isVideo) => {

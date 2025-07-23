@@ -7,8 +7,10 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       nodePolyfills({
-        globals: { global: true },
-        crypto: true,
+        globals: { global: true }, 
+        crypto: true, 
+        buffer: true, 
+        process: true, 
       }),
     ],
     server:
@@ -26,9 +28,14 @@ export default defineConfig(({ mode }) => {
               },
             },
           }
-        : {},
+        : {}, 
     resolve: {
       extensions: [".js", ".jsx"],
+    },
+    build: {
+      outDir: "dist", 
+      sourcemap: false, 
+      minify: "esbuild", 
     },
   };
 });
