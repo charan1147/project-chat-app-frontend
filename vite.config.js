@@ -16,12 +16,12 @@ export default defineConfig(({ mode }) => {
         ? {
             proxy: {
               "/api": {
-                target: "http://127.0.0.1:5016", // Explicit IPv4
+                target: process.env.VITE_BACKEND_URL || "http://localhost:5016",
                 changeOrigin: true,
                 secure: false,
               },
               "/socket.io": {
-                target: "http://127.0.0.1:5016", // Explicit IPv4
+                target: process.env.VITE_BACKEND_URL || "http://localhost:5016",
                 ws: true,
               },
             },
