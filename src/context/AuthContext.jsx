@@ -7,56 +7,43 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-useEffect(() => {
-  async function fetchUser() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setIsLoading(false);
-      return;
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await api.getMe();
+        console.log("getMe response:", res.data); 
+        setUser(res.data.user);
+      } catch (err) {
+        console.error("Auth check error:", err.response?.data || err.message);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
     }
+    fetchUser();
+  }, []);
 
+  const login = async (email, password) => {
+    const res = await api.login(email, password);
+    console.log("AuthContext login response:", res); 
+    if (res.user) {
+      setUser(res.user);
+    } else {
+      console.error("No user data in login response:", res);
+      throw new Error("Invalid login response: missing user data");
+    }
+    return res;
+  };
+
+  const logout = async () => {
     try {
-      const res = await api.getMe();
-      setUser(res.data.user);
+      await api.logout();
     } catch (err) {
-      console.error("getMe failed:", err.message);
-      localStorage.removeItem("token"); 
-      setUser(null);
+      console.error("Logout failed:", err.response?.data || err.message);
     } finally {
-      setIsLoading(false);
+      setUser(null);
     }
-  }
-
-  fetchUser();
-}, []);
-
-
-const login = async (email, password) => {
-  const res = await api.login(email, password);
-  const { token, user } = res;
-
-  if (token && user) {
-    localStorage.setItem("token", token); 
-    setUser(user);
-  } else {
-    throw new Error("Login failed: No token or user in response");
-  }
-
-  return res;
-};
-
-
-const logout = async () => {
-  try {
-    await api.logout();
-  } catch (err) {
-    console.error("Logout error:", err.message);
-  } finally {
-    localStorage.removeItem("token");
-    setUser(null);
-  }
-};
-
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
