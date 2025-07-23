@@ -6,12 +6,20 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Interceptor to add JWT token to headers
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) {
+  if (
+    token &&
+    config.url !== "/auth/login" &&
+    config.url !== "/auth/register"
+  ) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log("API Request:", {
+    url: config.url,
+    headers: config.headers,
+    data: config.data,
+  }); // Debug
   return config;
 });
 
@@ -19,6 +27,7 @@ export default {
   getMe: () => api.get("/users/me"),
   login: async (email, password) => {
     const res = await api.post("/auth/login", { email, password });
+    console.log("Login API response:", res.data); // Debug
     if (res.data.token) {
       localStorage.setItem("token", res.data.token);
     }
@@ -26,6 +35,7 @@ export default {
   },
   register: async (name, email, password) => {
     const res = await api.post("/auth/register", { name, email, password });
+    console.log("Register API response:", res.data); // Debug
     if (res.data.token) {
       localStorage.setItem("token", res.data.token);
     }

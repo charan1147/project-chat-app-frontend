@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import api from "../services/api";
 
 export const AuthContext = createContext();
@@ -11,8 +11,10 @@ export function AuthProvider({ children }) {
     async function fetchUser() {
       try {
         const res = await api.getMe();
+        console.log("getMe response:", res.data); // Debug
         setUser(res.data.user);
-      } catch {
+      } catch (err) {
+        console.error("Auth check error:", err.response?.data || err.message);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -23,19 +25,26 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await api.login(email, password);
-    setUser(res.data.user);
-    return res.data;
+    console.log("AuthContext login response:", res); // Debug
+    if (res.user) {
+      setUser(res.user);
+    } else {
+      console.error("No user data in login response:", res);
+      throw new Error("Invalid login response: missing user data");
+    }
+    return res;
   };
 
-const logout = async () => {
-  try {
-    await api.logout();
-  } catch (error) {
-    console.error("Logout failed:", error.message);
-  } finally {
-    setUser(null);
-  }
-};
+  const logout = async () => {
+    try {
+      await api.logout();
+    } catch (err) {
+      console.error("Logout failed:", err.response?.data || err.message);
+    } finally {
+      setUser(null);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
