@@ -14,16 +14,18 @@ export function AuthProvider({ children }) {
       if (token) {
         try {
           const res = await api.getMe();
+          console.log("getMe response:", res.data); // Debug
           if (res.data.success && res.data.user) {
-            setUser(res.data.user); // Matches backend response structure
+            setUser(res.data.user);
           } else {
             console.warn("Invalid getMe response:", res.data);
-            localStorage.removeItem("token"); // Invalidate invalid token
+            localStorage.removeItem("token");
             setUser(null);
           }
         } catch (err) {
           console.error(
-            "Auth restoration failed:",
+            "getMe error:",
+            err.response?.status,
             err.response?.data || err.message
           );
           localStorage.removeItem("token"); // Clear invalid token

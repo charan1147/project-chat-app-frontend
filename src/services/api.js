@@ -1,73 +1,97 @@
-import axios from "axios";
+import React, { useContext } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";
+import { ChatProvider } from "./context/ChatContext.jsx";
+import { ContactProvider } from "./context/ContactContext.jsx";
+import { CallProvider } from "./context/CallContext.jsx";
+import Navbar from "./components/Navbar.jsx";
+import Login from "./components/Auth/Login.jsx";
+import Register from "./components/Auth/Register.jsx";
+import Home from "./pages/Home.jsx";
+import Chat from "./pages/Chat.jsx";
+import ContactsPage from "./pages/ContactsPage.jsx";
+import CallPage from "./pages/CallPage.jsx";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5016/api",
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true,
-});
+function PrivateRoute({ children }) {
+  const { user, isLoading } = useContext(AuthContext);
+  if (isLoading) return <div>Loading authentication, please wait...</div>;
+  return user ? children : <Navigate to="/login" replace />;
+}
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (
-      token &&
-      config.url !== "/auth/login" &&
-      config.url !== "/auth/register"
-    ) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log("API Request:", {
-      url: config.url,
-      headers: config.headers,
-      data: config.data,
-    }); 
-    return config;
-  },
-  (error) => {
-    console.error("Request error:", error);
-    return Promise.reject(error);
-  }
-);
+function PublicRoute({ children }) {
+  const { user, isLoading } = useContext(AuthContext);
+  if (isLoading) return <div>Loading authentication, please wait...</div>;
+  return !user ? children : <Navigate to="/contacts" replace />;
+}
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error("Response error:", error.response?.data || error.message);
-    return Promise.reject(error);
-  }
-);
-
-export default {
-  getMe: () => api.get("/auth/me"),
-  login: async (email, password) => {
-    const res = await api.post("/auth/login", { email, password });
-    console.log("Login API response:", res.data); // Debug
-    if (res.data.token) localStorage.setItem("token", res.data.token);
-    return res.data;
-  },
-  register: async (name, email, password) => {
-    const res = await api.post("/auth/register", { name, email, password });
-    console.log("Register API response:", res.data); // Debug
-    if (res.data.token) localStorage.setItem("token", res.data.token);
-    return res.data;
-  },
-  getContacts: () => api.get("/contact/contacts"), // Updated to /contact
-  addContact: (email) => api.post("/contact/add-contact", { email }), // Updated to /contact
-  getMessages: (contactId) => api.get(`/messages/${contactId}`),
-  sendMessage: (receiverId, content) =>
-    api.post("/messages/send", { receiverId, content }),
-  startCall: (receiverId, roomId, signalData, callType = "video") =>
-    api.post("/call/start", { receiverId, roomId, signalData, callType }),
-  answerCall: (roomId, signalData) =>
-    api.post("/call/answer", { roomId, signalData }),
-  endCall: (roomId) => api.post("/call/end", { roomId }),
-  logout: () => {
-    localStorage.removeItem("token");
-    return api.post("/auth/logout");
-  },
-};
-
-export function getRoomId(user1, user2) {
-  if (!user1 || !user2) throw new Error("Invalid user IDs");
-  return [String(user1), String(user2)].sort().join("_");
+export default function App() {
+  return (
+    <AuthProvider>
+      <ChatProvider>
+        <ContactProvider>
+          <CallProvider>
+            <Router>
+              <Navbar />
+              <Routes>
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/register"
+                  element={
+                    <PublicRoute>
+                      <Register />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <Home />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/contacts"
+                  element={
+                    <PrivateRoute>
+                      <ContactsPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/chat/:contactId"
+                  element={
+                    <PrivateRoute>
+                      <Chat />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/call/:contactId"
+                  element={
+                    <PrivateRoute>
+                      <CallPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Router>
+          </CallProvider>
+        </ContactProvider>
+      </ChatProvider>
+    </AuthProvider>
+  );
 }

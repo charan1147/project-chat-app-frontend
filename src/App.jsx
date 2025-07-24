@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";
 import { ChatProvider } from "./context/ChatContext.jsx";
@@ -17,16 +18,30 @@ import Chat from "./pages/Chat.jsx";
 import ContactsPage from "./pages/ContactsPage.jsx";
 import CallPage from "./pages/CallPage.jsx";
 
+// Custom hook to get the current pathname
+function useCurrentPath() {
+  return useLocation().pathname;
+}
+
 function PrivateRoute({ children }) {
   const { user, isLoading } = useContext(AuthContext);
-  if (isLoading) return <div>Loading authentication...</div>; // User-friendly message
-  return user ? children : <Navigate to="/login" replace />;
+  const currentPath = useCurrentPath();
+  if (isLoading) return <div>Loading authentication, please wait...</div>;
+  return user ? (
+    children
+  ) : (
+    <Navigate to="/login" state={{ from: currentPath }} replace />
+  );
 }
 
 function PublicRoute({ children }) {
   const { user, isLoading } = useContext(AuthContext);
-  if (isLoading) return <div>Loading authentication...</div>;
-  return !user ? children : <Navigate to="/contacts" replace />;
+  const currentPath = useCurrentPath();
+  if (isLoading) return <div>Loading authentication, please wait...</div>;
+  if (user) {
+    return <Navigate to="/contacts" state={{ from: currentPath }} replace />;
+  }
+  return children;
 }
 
 export default function App() {
