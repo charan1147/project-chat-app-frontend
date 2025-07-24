@@ -8,26 +8,43 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await api.getMe();
-        console.log("getMe response:", res.data); // Debug
-        setUser(res.data.user); // Adjust for response structure
-      } catch (err) {
-        console.error("Auth check error:", err.response?.data || err.message);
+    async function restoreAuth() {
+      const token = localStorage.getItem("token");
+      console.log("Restoring auth with token:", token); // Debug
+      if (token) {
+        try {
+          const res = await api.getMe();
+          if (res.data.success && res.data.user) {
+            setUser(res.data.user); // Matches backend response structure
+          } else {
+            console.warn("Invalid getMe response:", res.data);
+            localStorage.removeItem("token"); // Invalidate invalid token
+            setUser(null);
+          }
+        } catch (err) {
+          console.error(
+            "Auth restoration failed:",
+            err.response?.data || err.message
+          );
+          localStorage.removeItem("token"); // Clear invalid token
+          setUser(null);
+        }
+      } else {
         setUser(null);
-      } finally {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     }
-    fetchUser();
+    restoreAuth();
   }, []);
 
   const login = async (email, password) => {
     const res = await api.login(email, password);
-    console.log("AuthContext login response:", res); // Debug
-    if (res.user) setUser(res.user);
-    else throw new Error("Invalid login response: missing user data");
+    console.log("Login response:", res); // Debug
+    if (res.success && res.user) {
+      setUser(res.user);
+    } else {
+      throw new Error("Login failed: Invalid response");
+    }
     return res;
   };
 
@@ -38,6 +55,7 @@ export function AuthProvider({ children }) {
     } catch (err) {
       console.error("Logout failed:", err.response?.data || err.message);
     } finally {
+      localStorage.removeItem("token");
       setUser(null);
       setIsLoading(false);
     }

@@ -19,14 +19,14 @@ import CallPage from "./pages/CallPage.jsx";
 
 function PrivateRoute({ children }) {
   const { user, isLoading } = useContext(AuthContext);
-  if (isLoading) return <div>Loading...</div>;
-  return user ? children : <Navigate to="/login" />;
+  if (isLoading) return <div>Loading authentication...</div>; // User-friendly message
+  return user ? children : <Navigate to="/login" replace />;
 }
 
 function PublicRoute({ children }) {
   const { user, isLoading } = useContext(AuthContext);
-  if (isLoading) return <div>Loading...</div>;
-  return !user ? children : <Navigate to="/contacts" />;
+  if (isLoading) return <div>Loading authentication...</div>;
+  return !user ? children : <Navigate to="/contacts" replace />;
 }
 
 export default function App() {
@@ -86,7 +86,7 @@ export default function App() {
                     </PrivateRoute>
                   }
                 />
-                <Route path="*" element={<Navigate to="/" />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Router>
           </CallProvider>
