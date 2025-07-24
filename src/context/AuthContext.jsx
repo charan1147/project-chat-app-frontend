@@ -10,11 +10,12 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function restoreAuth() {
       const token = localStorage.getItem("token");
-      console.log("Restoring auth with token:", token); // Debug
+      console.log("Restoring auth, token present:", !!token);
       if (token) {
+        setUser({ id: "temp", email: "loading" }); // Temporary user to prevent redirect
         try {
           const res = await api.getMe();
-          console.log("getMe response:", res.data); // Debug
+          console.log("getMe response:", res.data);
           if (res.data.success && res.data.user) {
             setUser(res.data.user);
           } else {
@@ -28,8 +29,25 @@ export function AuthProvider({ children }) {
             err.response?.status,
             err.response?.data || err.message
           );
-          localStorage.removeItem("token"); // Clear invalid token
-          setUser(null);
+          // Retry once if network error (e.g., 500 or timeout)
+          if (err.response?.status >= 500) {
+            try {
+              const retryRes = await api.getMe();
+              if (retryRes.data.success && retryRes.data.user) {
+                setUser(retryRes.data.user);
+              } else {
+                localStorage.removeItem("token");
+                setUser(null);
+              }
+            } catch (retryErr) {
+              console.error("Retry failed:", retryErr.message);
+              localStorage.removeItem("token");
+              setUser(null);
+            }
+          } else {
+            localStorage.removeItem("token");
+            setUser(null);
+          }
         }
       } else {
         setUser(null);
@@ -41,7 +59,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await api.login(email, password);
-    console.log("Login response:", res); // Debug
+    console.log("Login response:", res);
     if (res.success && res.user) {
       setUser(res.user);
     } else {

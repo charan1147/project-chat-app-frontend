@@ -27,7 +27,7 @@ function PrivateRoute({ children }) {
   const { user, isLoading } = useContext(AuthContext);
   const currentPath = useCurrentPath();
   if (isLoading) return <div>Loading authentication, please wait...</div>;
-  return user ? (
+  return user && user.id !== "temp" ? (
     children
   ) : (
     <Navigate to="/login" state={{ from: currentPath }} replace />
@@ -38,7 +38,7 @@ function PublicRoute({ children }) {
   const { user, isLoading } = useContext(AuthContext);
   const currentPath = useCurrentPath();
   if (isLoading) return <div>Loading authentication, please wait...</div>;
-  if (user) {
+  if (user && user.id !== "temp") {
     return <Navigate to="/contacts" state={{ from: currentPath }} replace />;
   }
   return children;
