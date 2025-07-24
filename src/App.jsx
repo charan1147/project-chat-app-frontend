@@ -4,45 +4,22 @@ import {
   Routes,
   Route,
   Navigate,
-  useLocation,
 } from "react-router-dom";
-import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";
-import { ChatProvider } from "./context/ChatContext.jsx";
-import { ContactProvider } from "./context/ContactContext.jsx";
-import { CallProvider } from "./context/CallContext.jsx";
-import Navbar from "./components/Navbar.jsx";
-import Login from "./components/Auth/Login.jsx";
-import Register from "./components/Auth/Register.jsx";
-import Home from "./pages/Home.jsx";
-import Chat from "./pages/Chat.jsx";
-import ContactsPage from "./pages/ContactsPage.jsx";
-import CallPage from "./pages/CallPage.jsx";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { ChatProvider } from "./context/ChatContext";
+import { ContactProvider } from "./context/ContactContext";
+import { CallProvider } from "./context/CallContext";
 
-// Custom hook to get the current pathname
-function useCurrentPath() {
-  return useLocation().pathname;
-}
+import Navbar from "./components/Navbar";
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
+import Home from "./pages/Home";
+import Chat from "./pages/Chat";
+import ContactsPage from "./pages/ContactsPage";
+import CallPage from "./pages/CallPage";
+import PublicRoute from "./routes/PublicRoute";
+import PrivateRoute from "./routes/PrivateRoute";
 
-function PrivateRoute({ children }) {
-  const { user, isLoading } = useContext(AuthContext);
-  const currentPath = useCurrentPath();
-  if (isLoading) return <div>Loading authentication, please wait...</div>;
-  return user && user.id !== "temp" ? (
-    children
-  ) : (
-    <Navigate to="/login" state={{ from: currentPath }} replace />
-  );
-}
-
-function PublicRoute({ children }) {
-  const { user, isLoading } = useContext(AuthContext);
-  const currentPath = useCurrentPath();
-  if (isLoading) return <div>Loading authentication, please wait...</div>;
-  if (user && user.id !== "temp") {
-    return <Navigate to="/contacts" state={{ from: currentPath }} replace />;
-  }
-  return children;
-}
 
 export default function App() {
   return (

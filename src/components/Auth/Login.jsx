@@ -1,65 +1,64 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import api from "../../services/api";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const { login } = useContext(AuthContext);
+const Login = () => {
+  const { login, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/contacts"; // Default to /contacts if no from
+  const from = location.state?.from || "/contacts"; // Redirect to original page or contacts
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.includes("@") || !password) {
+    if (!formData.email.includes("@") || !formData.password) {
       setError("Please enter a valid email and password.");
       return;
     }
     try {
-      const response = await login(email, password);
-      console.log("Login response:", response);
-      navigate(from, { replace: true }); // Redirect to the original page
+      const res = await login(formData.email, formData.password);
+      console.log("Login success:", res);
+      navigate(from, { replace: true });
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || err.message || "Login failed";
-      setError(errorMessage);
-      console.error("Login error:", {
-        message: errorMessage,
-        status: err.response?.status,
-      });
+      setError(err.message || "Login failed");
+      console.error("Login error:", err);
     }
   };
 
   return (
     <div>
       <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        <input
+          name="email"
+          onChange={handleChange}
+          value={formData.email}
+          placeholder="Email"
+          required
+        />
+        <input
+          name="password"
+          onChange={handleChange}
+          value={formData.password}
+          type="password"
+          placeholder="Password"
+          required
+        />
         <button type="submit">Login</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <p>
+          No account? <Link to="/register">Register</Link>
+        </p>
       </form>
-      <p>
-        No account? <Link to="/register">Register</Link>
-      </p>
     </div>
   );
-}
+};
+
+export default Login;
