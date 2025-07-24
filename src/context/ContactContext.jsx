@@ -11,7 +11,8 @@ export const ContactProvider = ({ children }) => {
       try {
         const res = await api.getContacts();
         setContacts(res.data.contacts || []);
-      } catch {
+      } catch (err) {
+        console.error("Failed to fetch contacts:", err);
         setContacts([]);
       }
     }
@@ -19,9 +20,14 @@ export const ContactProvider = ({ children }) => {
   }, []);
 
   const addContactToList = async (email) => {
-    await api.addContact(email);
-    const res = await api.getContacts();
-    setContacts(res.data.contacts || []);
+    try {
+      await api.addContact(email);
+      const res = await api.getContacts();
+      setContacts(res.data.contacts || []);
+    } catch (err) {
+      console.error("Failed to add contact:", err);
+      throw err;
+    }
   };
 
   return (

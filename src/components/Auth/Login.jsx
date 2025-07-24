@@ -11,9 +11,13 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!email.includes("@") || !password) {
+      setError("Please enter a valid email and password.");
+      return;
+    }
     try {
       const response = await login(email, password);
-      console.log("Login response:", response); // Debug
+      console.log("Login response:", response);
       navigate("/contacts");
     } catch (err) {
       const errorMessage =
@@ -22,8 +26,6 @@ export default function Login() {
       console.error("Login error:", {
         message: errorMessage,
         status: err.response?.status,
-        data: err.response?.data,
-        url: err.config?.url,
       });
     }
   };

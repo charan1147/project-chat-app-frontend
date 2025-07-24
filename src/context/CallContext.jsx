@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef, useContext } from "react";
+import React, { createContext, useState, useEffect, useRef, useContext } from "react";
 import Peer from "simple-peer";
 import socket from "../websocket/Socket.js";
 import { getRoomId } from "../services/api.js";
@@ -32,15 +32,14 @@ export const CallProvider = ({ children }) => {
       peerRef.current?.signal(signal);
     });
 
-    socket.on("call:ended", () => {
-      endCall();
-    });
+    socket.on("call:ended", () => endCall());
 
     return () => {
       socket.off("call:user");
       socket.off("call:accepted");
       socket.off("call:ended");
-      socket.disconnect();
+      if (localStream) localStream.getTracks().forEach((track) => track.stop());
+      if (peerRef.current) peerRef.current.destroy();
     };
   }, [user?.id]);
 

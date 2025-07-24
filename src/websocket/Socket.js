@@ -10,4 +10,12 @@ const socket = io(URL, {
   },
 });
 
+socket.on("connect_error", (error) => {
+  console.error("Socket connection error:", error.message);
+});
+
+socket.on("reconnect_attempt", () => {
+  console.log("Attempting to reconnect...");
+});
+
 export default socket;

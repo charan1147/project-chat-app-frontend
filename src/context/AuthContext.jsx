@@ -11,8 +11,8 @@ export function AuthProvider({ children }) {
     async function fetchUser() {
       try {
         const res = await api.getMe();
-        console.log("getMe response:", res.data); 
-        setUser(res.data.user);
+        console.log("getMe response:", res.data); // Debug
+        setUser(res.data.user); // Adjust for response structure
       } catch (err) {
         console.error("Auth check error:", err.response?.data || err.message);
         setUser(null);
@@ -25,23 +25,21 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await api.login(email, password);
-    console.log("AuthContext login response:", res); 
-    if (res.user) {
-      setUser(res.user);
-    } else {
-      console.error("No user data in login response:", res);
-      throw new Error("Invalid login response: missing user data");
-    }
+    console.log("AuthContext login response:", res); // Debug
+    if (res.user) setUser(res.user);
+    else throw new Error("Invalid login response: missing user data");
     return res;
   };
 
   const logout = async () => {
     try {
+      setIsLoading(true);
       await api.logout();
     } catch (err) {
       console.error("Logout failed:", err.response?.data || err.message);
     } finally {
       setUser(null);
+      setIsLoading(false);
     }
   };
 

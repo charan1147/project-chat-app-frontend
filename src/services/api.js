@@ -1,48 +1,58 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5016/api",
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (
-    token &&
-    config.url !== "/auth/login" &&
-    config.url !== "/auth/register"
-  ) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (
+      token &&
+      config.url !== "/auth/login" &&
+      config.url !== "/auth/register"
+    ) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log("API Request:", {
+      url: config.url,
+      headers: config.headers,
+      data: config.data,
+    }); 
+    return config;
+  },
+  (error) => {
+    console.error("Request error:", error);
+    return Promise.reject(error);
   }
-  console.log("API Request:", {
-    url: config.url,
-    headers: config.headers,
-    data: config.data,
-  }); 
-  return config;
-});
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("Response error:", error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
 
 export default {
-  getMe: () => api.get("/users/me"),
+  getMe: () => api.get("/auth/me"),
   login: async (email, password) => {
     const res = await api.post("/auth/login", { email, password });
-    console.log("Login API response:", res.data); 
-    if (res.data.token) {
-      localStorage.setItem("token", res.data.token);
-    }
+    console.log("Login API response:", res.data); // Debug
+    if (res.data.token) localStorage.setItem("token", res.data.token);
     return res.data;
   },
   register: async (name, email, password) => {
     const res = await api.post("/auth/register", { name, email, password });
-    console.log("Register API response:", res.data); 
-    if (res.data.token) {
-      localStorage.setItem("token", res.data.token);
-    }
+    console.log("Register API response:", res.data); // Debug
+    if (res.data.token) localStorage.setItem("token", res.data.token);
     return res.data;
   },
-  getContacts: () => api.get("/users/contacts"),
-  addContact: (email) => api.post("/users/add-contact", { email }),
+  getContacts: () => api.get("/contact/contacts"), // Updated to /contact
+  addContact: (email) => api.post("/contact/add-contact", { email }), // Updated to /contact
   getMessages: (contactId) => api.get(`/messages/${contactId}`),
   sendMessage: (receiverId, content) =>
     api.post("/messages/send", { receiverId, content }),
