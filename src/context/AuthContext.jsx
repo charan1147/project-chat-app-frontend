@@ -11,14 +11,12 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem("token");
     console.log("Restoring auth, token present:", !!token);
     if (token) {
-      // Temporary user to prevent immediate redirect
-      setUser({ id: "temp", email: "loading" });
+      setUser({ id: "temp", email: "loading" }); // Temporary user to prevent redirect
       api
         .getMe()
         .then((res) => {
           console.log("getMe response:", res.data);
           if (res.data.user) {
-            // Adjusted for your backend response
             setUser(res.data.user);
           } else {
             localStorage.removeItem("token");
@@ -42,14 +40,14 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await api.login(email, password);
-    console.log("Login response:", res);
-    if (res.data.success && res.data.user && res.data.token) {
-      localStorage.setItem("token", res.data.token);
-      setUser(res.data.user);
+    console.log("Login response in AuthProvider:", res);
+    if (res.success && res.user && res.token) {
+      localStorage.setItem("token", res.token);
+      setUser(res.user);
     } else {
       throw new Error("Login failed: Invalid response");
     }
-    return res.data;
+    return res;
   };
 
   const logout = async () => {
