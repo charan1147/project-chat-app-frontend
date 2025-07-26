@@ -4,10 +4,10 @@ import { AuthContext } from "../../context/AuthContext";
 import api from "../../services/api";
 
 const Login = () => {
-  const { login, setUser } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/contacts"; // Redirect to original page or contacts
+  const from = location.state?.from || "/contacts";
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -23,8 +23,7 @@ const Login = () => {
       return;
     }
     try {
-      const res = await login(formData.email, formData.password);
-      console.log("Login success:", res);
+      await login(formData.email, formData.password);
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || "Login failed");
