@@ -9,9 +9,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("Restoring auth, token found:", !!token);
+    console.log("Restoring auth, token found:", !!token, token);
     if (token) {
-      setUser({ id: "temp", email: "loading" }); // Hold state during loading
+      setUser({ id: "temp", email: "loading" });
       api
         .getMe()
         .then((res) => {
@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
               "getMe invalid response, using token fallback:",
               res.data
             );
-            setUser({ id: "token-based", email: "authenticated", token }); // Preserve token
+            setUser({ id: "token-based", email: "authenticated", token });
           }
         })
         .catch((err) => {
@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
           );
           console.log("Falling back to token presence:", token);
           if (token) {
-            setUser({ id: "token-based", email: "authenticated", token }); // Use existing token
+            setUser({ id: "token-based", email: "authenticated", token });
           } else {
             setUser(null);
           }
@@ -49,8 +49,8 @@ export function AuthProvider({ children }) {
     const res = await api.login(email, password);
     console.log("Login response:", res);
     if (res.success && res.user && res.token) {
-      localStorage.setItem("token", res.token); // Ensure token is set
-      console.log("Token stored:", res.token);
+      localStorage.setItem("token", res.token);
+      console.log("Token successfully stored:", res.token);
       setUser(res.user);
     } else {
       throw new Error("Login failed: Invalid response structure");
