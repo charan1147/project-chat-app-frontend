@@ -47,7 +47,10 @@ export default {
   login: async (email, password) => {
     const res = await api.post("/auth/login", { email, password });
     console.log("Login API response:", res.data);
-    if (res.data.token) localStorage.setItem("token", res.data.token);
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token); // Double-check token storage
+      console.log("Token successfully stored:", res.data.token);
+    }
     return res.data;
   },
   register: async (name, email, password) => {
