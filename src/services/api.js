@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ,
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5016/api",
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
@@ -15,12 +15,17 @@ api.interceptors.request.use(
       config.url !== "/auth/register"
     ) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Request with token:", {
+        url: config.url,
+        authorization: config.headers.Authorization,
+        data: config.data,
+      });
+    } else {
+      console.log("Request without token:", {
+        url: config.url,
+        data: config.data,
+      });
     }
-    console.log("API Request:", {
-      url: config.url,
-      headers: config.headers,
-      data: config.data,
-    });
     return config;
   },
   (error) => {
