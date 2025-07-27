@@ -7,7 +7,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const token = localStorage.getItem("token");
     if (
       token &&
@@ -21,13 +21,10 @@ api.interceptors.request.use(
           authorization: config.headers.Authorization,
           data: config.data,
         });
-        // Simple token validation (check if it's a valid JWT)
+        // Basic JWT format check
         const [header, payload, signature] = token.split(".");
         if (!header || !payload || !signature) {
-          console.warn(
-            "Invalid token format, attempting to refresh or clear:",
-            token
-          );
+          console.warn("Invalid token format:", token);
           localStorage.removeItem("token");
           throw new Error("Invalid token format");
         }
@@ -52,31 +49,7 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
-      originalRequest._retry = true;
-      console.log("401 detected, attempting token refresh...");
-      try {
-        const res = await api.post("/auth/refresh"); // Assuming a refresh endpoint
-        const newToken = res.data.token;
-        localStorage.setItem("token", newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        console.log("Refreshed token, retrying request:", newToken);
-        return api(originalRequest);
-      } catch (refreshError) {
-        console.error(
-          "Token refresh failed:",
-          refreshError.response?.data || refreshError.message
-        );
-        localStorage.removeItem("token");
-        return Promise.reject(refreshError);
-      }
-    }
+  (error) => {
     console.error("Response error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
@@ -113,7 +86,6 @@ export default {
     localStorage.removeItem("token");
     return api.post("/auth/logout");
   },
-  refresh: () => api.post("/auth/refresh"), // Assuming refresh endpoint
 };
 
 export function getRoomId(user1, user2) {
