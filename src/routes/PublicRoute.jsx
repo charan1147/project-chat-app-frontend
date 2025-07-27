@@ -7,10 +7,9 @@ export default function PublicRoute({ children }) {
   const location = useLocation();
 
   if (isLoading) return <div>Loading authentication, please wait...</div>;
-  if (user && user.id !== "temp") {
-    return (
-      <Navigate to="/contacts" state={{ from: location.pathname }} replace />
-    );
-  }
-  return children;
+  return user ? (
+    <Navigate to="/contacts" state={{ from: location.pathname }} replace />
+  ) : (
+    children
+  );
 }

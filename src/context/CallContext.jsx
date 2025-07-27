@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useRef, useContext } from "react";
+import { createContext, useState, useEffect, useRef, useContext } from "react";
 import Peer from "simple-peer";
 import socket from "../websocket/Socket.js";
 import { getRoomId } from "../services/api.js";
@@ -18,9 +18,13 @@ export const CallProvider = ({ children }) => {
   const peerRef = useRef(null);
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?._id) {
       socket.connect();
-      socket.emit("register", user.id);
+      socket.emit("register", user._id, (response) => {
+        if (response?.error) {
+          setError(response.error); // NEW: Handle socket registration errors
+        }
+      });
     }
 
     socket.on("call:user", ({ from, signal, roomId }) => {
@@ -34,14 +38,19 @@ export const CallProvider = ({ children }) => {
 
     socket.on("call:ended", () => endCall());
 
+    // NEW: Handle socket connection errors
+    socket.on("connectionError", (message) => {
+      setError(`Socket error: ${message}`);
+    });
+
     return () => {
       socket.off("call:user");
       socket.off("call:accepted");
       socket.off("call:ended");
-      if (localStream) localStream.getTracks().forEach((track) => track.stop());
-      if (peerRef.current) peerRef.current.destroy();
+      socket.off("connectionError");
+      // CHANGED: Move cleanup to endCall to avoid duplication
     };
-  }, [user?.id]);
+  }, [user?._id]);
 
   const getMediaStream = async (isVideo = true) => {
     try {
@@ -65,13 +74,10 @@ export const CallProvider = ({ children }) => {
   const callUser = async (remoteUserId, isVideo = true) => {
     try {
       setError(null);
-      if (localStream) {
-        localStream.getTracks().forEach((track) => track.stop());
-      }
       const stream = await getMediaStream(isVideo);
       setLocalStream(stream);
 
-      const roomId = getRoomId(user.id, remoteUserId);
+      const roomId = getRoomId(user._id, remoteUserId);
       peerRef.current = new Peer({
         initiator: true,
         trickle: true,
@@ -80,16 +86,11 @@ export const CallProvider = ({ children }) => {
       });
 
       peerRef.current.on("signal", async (signal) => {
-        await api.startCall(
-          remoteUserId,
-          roomId,
-          signal,
-          isVideo ? "video" : "audio"
-        );
+        await api.startCall(remoteUserId, signal, isVideo ? "video" : "audio");
         socket.emit("callUser", {
           receiverId: remoteUserId,
           signalData: signal,
-          from: user.id,
+          from: user._id,
           roomId,
         });
       });
@@ -110,9 +111,6 @@ export const CallProvider = ({ children }) => {
   const answerCall = async () => {
     try {
       setError(null);
-      if (localStream) {
-        localStream.getTracks().forEach((track) => track.stop());
-      }
       const stream = await getMediaStream(call.callType !== "audio");
       setLocalStream(stream);
       setCallAccepted(true);
@@ -146,7 +144,7 @@ export const CallProvider = ({ children }) => {
 
   const endCall = async () => {
     try {
-      const roomId = call.roomId || getRoomId(user.id, call.from || "");
+      const roomId = call.roomId || getRoomId(user._id, call.from || "");
       await api.endCall(roomId);
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
@@ -155,7 +153,7 @@ export const CallProvider = ({ children }) => {
         peerRef.current.destroy();
       }
       setLocalStream(null);
-      setRemoteStream(null);
+      seorangStream(null);
       setCallAccepted(false);
       setCallEnded(true);
       setCall({});

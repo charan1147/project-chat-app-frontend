@@ -7,22 +7,26 @@ export default function ChatBox({ messages = [], currentUserId }) {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const formatDate = (iso) =>
-    new Date(iso).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  const formatTime = (iso) =>
-    new Date(iso).toLocaleTimeString(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // NEW: Moved to utility function
+  const formatDateTime = (iso) => {
+    const date = new Date(iso);
+    return {
+      date: date.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      time: date.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  };
 
   const groupedMessages = messages.reduce((acc, msg) => {
-    const dateKey = formatDate(msg.createdAt || msg.timestamp);
-    acc[dateKey] = acc[dateKey] || [];
-    acc[dateKey].push(msg);
+    const { date } = formatDateTime(msg.createdAt || msg.timestamp);
+    acc[date] = acc[date] || [];
+    acc[date].push(msg);
     return acc;
   }, {});
 
@@ -44,6 +48,7 @@ export default function ChatBox({ messages = [], currentUserId }) {
             const senderName = isCurrentUser
               ? "You"
               : msg.sender?.name || "Unknown User";
+            const { time } = formatDateTime(msg.createdAt || msg.timestamp);
             return (
               <div
                 key={msg._id}
@@ -63,7 +68,7 @@ export default function ChatBox({ messages = [], currentUserId }) {
                   <div style={{ fontWeight: "bold" }}>{senderName}</div>
                   <div>{msg.content}</div>
                   <div style={{ fontSize: "0.7rem", color: "#666" }}>
-                    {formatTime(msg.createdAt || msg.timestamp)}
+                    {time}
                   </div>
                 </div>
               </div>

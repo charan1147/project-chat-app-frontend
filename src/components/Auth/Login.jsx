@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import api from "../../services/api";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
@@ -27,7 +26,6 @@ const Login = () => {
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || "Login failed");
-      console.error("Login error:", err);
     }
   };
 

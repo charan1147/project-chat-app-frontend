@@ -4,12 +4,10 @@ export const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
-  const [selectedContact, setSelectedContact] = useState(null);
+  // TRIMMED: Removed selectedContact (managed in Chat.jsx)
 
   return (
-    <ChatContext.Provider
-      value={{ messages, setMessages, selectedContact, setSelectedContact }}
-    >
+    <ChatContext.Provider value={{ messages, setMessages }}>
       {children}
     </ChatContext.Provider>
   );

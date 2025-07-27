@@ -3,7 +3,7 @@ import { ContactContext } from "../context/ContactContext";
 
 export default function AddContact() {
   const [email, setEmail] = useState("");
-  const { addContactToList } = useContext(ContactContext);
+  const { addContactToList, error } = useContext(ContactContext); // CHANGED: Use context error
 
   const addContact = async (e) => {
     e.preventDefault();
@@ -11,7 +11,7 @@ export default function AddContact() {
       await addContactToList(email.trim());
       setEmail("");
     } catch {
-      alert("Failed to add contact");
+      // Error handled in ContactContext
     }
   };
 
@@ -25,6 +25,8 @@ export default function AddContact() {
         required
       />
       <button type="submit">Add Contact</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}{" "}
+      {/* NEW: Display errors */}
     </form>
   );
 }

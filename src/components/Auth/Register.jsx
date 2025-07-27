@@ -6,6 +6,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // NEW: Added error state
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,8 +14,8 @@ export default function Register() {
     try {
       await api.register(name, email, password);
       navigate("/login");
-    } catch {
-      alert("Registration failed");
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -50,6 +51,7 @@ export default function Register() {
           />
         </div>
         <button type="submit">Register</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}{" "}
       </form>
       <p>
         Have an account? <Link to="/login">Login</Link>

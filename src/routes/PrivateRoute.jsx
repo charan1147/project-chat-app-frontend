@@ -7,7 +7,7 @@ export default function PrivateRoute({ children }) {
   const location = useLocation();
 
   if (isLoading) return <div>Loading authentication, please wait...</div>;
-  return user && (user.id !== "temp" || user.id === "token-based") ? (
+  return user ? (
     children
   ) : (
     <Navigate to="/login" state={{ from: location.pathname }} replace />

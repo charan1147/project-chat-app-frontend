@@ -12,6 +12,7 @@ const socket = io(URL, {
 
 socket.on("connect_error", (error) => {
   console.error("Socket connection error:", error.message);
+  socket.emit("connectionError", error.message);
 });
 
 socket.on("reconnect_attempt", () => {

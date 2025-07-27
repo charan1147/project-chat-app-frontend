@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChatContext } from "../context/ChatContext.jsx";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { CallContext } from "../context/CallContext.jsx";
+import { ChatContext } from "../context/ChatContext.jsx";
 import api from "../services/api.js";
 import ChatBox from "../components/Chat/ChatBox.jsx";
 import useWebSocket from "../hooks/useWebSocket.jsx";
@@ -11,24 +11,25 @@ export default function Chat() {
   const { contactId } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { callUser } = useContext(CallContext);
-  const { messages, setMessages, setSelectedContact } = useContext(ChatContext);
+  const { callUser, error: callError } = useContext(CallContext); // CHANGED: Use call error
+  const { messages, setMessages } = useContext(ChatContext);
   const [input, setInput] = useState("");
+  const [error, setError] = useState(""); // NEW: Added error state
 
   useEffect(() => {
     async function fetchMessages() {
       try {
         const res = await api.getMessages(contactId);
         setMessages(res.data.messages || []);
-      } catch {
-        console.error("Failed to fetch messages");
+        setError("");
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch messages");
       }
     }
     if (contactId) {
-      setSelectedContact({ _id: contactId });
       fetchMessages();
     }
-  }, [contactId, setMessages, setSelectedContact]);
+  }, [contactId, setMessages]);
 
   const handleReceive = (msg) => {
     if (
@@ -57,8 +58,9 @@ export default function Chat() {
         },
       ]);
       setInput("");
-    } catch {
-      console.error("Failed to send message");
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send message");
     }
   };
 
@@ -71,6 +73,10 @@ export default function Chat() {
 
   return (
     <div>
+      {(error || callError) && (
+        <p style={{ color: "red" }}>{error || callError}</p>
+      )}{" "}
+      {/* NEW: Display errors */}
       <ChatBox messages={messages} currentUserId={user._id} />
       <div style={{ display: "flex", marginTop: 10 }}>
         <input

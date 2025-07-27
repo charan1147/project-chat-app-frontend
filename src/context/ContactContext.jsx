@@ -5,14 +5,16 @@ export const ContactContext = createContext();
 
 export const ContactProvider = ({ children }) => {
   const [contacts, setContacts] = useState([]);
+  const [error, setError] = useState(null); // NEW: Added error state
 
   useEffect(() => {
     async function fetchContacts() {
       try {
         const res = await api.getContacts();
         setContacts(res.data.contacts || []);
+        setError(null);
       } catch (err) {
-        console.error("Failed to fetch contacts:", err);
+        setError(err.response?.data?.message || "Failed to fetch contacts");
         setContacts([]);
       }
     }
@@ -24,15 +26,16 @@ export const ContactProvider = ({ children }) => {
       await api.addContact(email);
       const res = await api.getContacts();
       setContacts(res.data.contacts || []);
+      setError(null);
     } catch (err) {
-      console.error("Failed to add contact:", err);
+      setError(err.response?.data?.message || "Failed to add contact");
       throw err;
     }
   };
 
   return (
     <ContactContext.Provider
-      value={{ contacts, setContacts, addContactToList }}
+      value={{ contacts, setContacts, addContactToList, error }}
     >
       {children}
     </ContactContext.Provider>

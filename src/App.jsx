@@ -1,25 +1,23 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import { ChatProvider } from "./context/ChatContext";
 import { ContactProvider } from "./context/ContactContext";
 import { CallProvider } from "./context/CallContext";
-
 import Navbar from "./components/Navbar";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import ContactsPage from "./pages/ContactsPage";
-import CallPage from "./pages/CallPage";
+import CallScreen from "./components/CallScreen"; // CHANGED: Use CallScreen directly
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
-
 
 export default function App() {
   return (
@@ -74,7 +72,8 @@ export default function App() {
                   path="/call/:contactId"
                   element={
                     <PrivateRoute>
-                      <CallPage />
+                      <CallScreen />{" "}
+                      {/* CHANGED: Replaced CallPage with CallScreen */}
                     </PrivateRoute>
                   }
                 />

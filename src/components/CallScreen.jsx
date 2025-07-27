@@ -21,7 +21,6 @@ export default function CallScreen() {
   const localRef = useRef();
   const remoteRef = useRef();
 
-  // Find contact name for display
   const contact = contacts.find((c) => c._id === contactId);
   const contactName = contact
     ? contact.name || contact.email
