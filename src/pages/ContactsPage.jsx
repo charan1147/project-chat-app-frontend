@@ -2,11 +2,19 @@ import React from "react";
 import Contacts from "./Contacts";
 import AddContact from "../components/AddContact";
 
-export default function ContactsPage() {
+function ContactsPage() {
   return (
-    <div>
-      <Contacts />
-      <AddContact />
+    <div className="container mt-4">
+      <div className="row">
+        <div className="col-md-6">
+          <Contacts />
+        </div>
+        <div className="col-md-6">
+          <AddContact />
+        </div>
+      </div>
     </div>
   );
 }
+
+export default  ContactsPage

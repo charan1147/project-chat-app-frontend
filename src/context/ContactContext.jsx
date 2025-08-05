@@ -5,8 +5,7 @@ export const ContactContext = createContext();
 
 export const ContactProvider = ({ children }) => {
   const [contacts, setContacts] = useState([]);
-  const [error, setError] = useState(null); // NEW: Added error state
-
+  const [error, setError] = useState(null);
   useEffect(() => {
     async function fetchContacts() {
       try {

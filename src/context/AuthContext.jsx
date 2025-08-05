@@ -14,10 +14,9 @@ export function AuthProvider({ children }) {
         .getMe()
         .then((res) => {
           if (res.data && res.data._id) {
-            // CHANGED: Check for valid user data
+
             setUser(res.data);
           } else {
-            // CHANGED: Clear token if getMe fails
             localStorage.removeItem("token");
             setUser(null);
           }

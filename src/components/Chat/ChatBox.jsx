@@ -1,13 +1,12 @@
 import React, { useEffect, useRef } from "react";
 
-export default function ChatBox({ messages = [], currentUserId }) {
+function ChatBox({ messages = [], currentUserId }) {
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // NEW: Moved to utility function
   const formatDateTime = (iso) => {
     const date = new Date(iso);
     return {
@@ -32,16 +31,12 @@ export default function ChatBox({ messages = [], currentUserId }) {
 
   return (
     <div
-      style={{
-        border: "1px solid #ccc",
-        padding: 10,
-        maxHeight: 300,
-        overflowY: "auto",
-      }}
+      className="border p-3 bg-light rounded overflow-auto"
+      style={{ maxHeight: "400px" }}
     >
       {Object.entries(groupedMessages).map(([date, msgs]) => (
         <div key={date}>
-          <div style={{ textAlign: "center", fontWeight: "bold" }}>{date}</div>
+          <div className="text-center fw-bold my-2 text-primary">{date}</div>
           {msgs.map((msg) => {
             const isCurrentUser =
               (msg.sender?._id || msg.sender) === currentUserId;
@@ -49,27 +44,25 @@ export default function ChatBox({ messages = [], currentUserId }) {
               ? "You"
               : msg.sender?.name || "Unknown User";
             const { time } = formatDateTime(msg.createdAt || msg.timestamp);
+
             return (
               <div
                 key={msg._id}
-                style={{
-                  textAlign: isCurrentUser ? "right" : "left",
-                  margin: "4px 0",
-                }}
+                className={`d-flex ${
+                  isCurrentUser
+                    ? "justify-content-end"
+                    : "justify-content-start"
+                } mb-2`}
               >
                 <div
-                  style={{
-                    display: "inline-block",
-                    padding: "6px 12px",
-                    borderRadius: 10,
-                    backgroundColor: isCurrentUser ? "#dcf8c6" : "#f1f0f0",
-                  }}
+                  className={`p-2 rounded-3 shadow-sm ${
+                    isCurrentUser ? "bg-success text-white" : "bg-white"
+                  }`}
+                  style={{ maxWidth: "75%" }}
                 >
-                  <div style={{ fontWeight: "bold" }}>{senderName}</div>
+                  <div className="fw-semibold mb-1">{senderName}</div>
                   <div>{msg.content}</div>
-                  <div style={{ fontSize: "0.7rem", color: "#666" }}>
-                    {time}
-                  </div>
+                  <div className="text-muted small text-end">{time}</div>
                 </div>
               </div>
             );
@@ -80,3 +73,5 @@ export default function ChatBox({ messages = [], currentUserId }) {
     </div>
   );
 }
+
+export default ChatBox

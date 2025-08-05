@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react";
 import { ContactContext } from "../context/ContactContext";
 
-export default function AddContact() {
+ function AddContact() {
   const [email, setEmail] = useState("");
-  const { addContactToList, error } = useContext(ContactContext); // CHANGED: Use context error
+  const { addContactToList, error } = useContext(ContactContext);
 
   const addContact = async (e) => {
     e.preventDefault();
@@ -11,22 +11,46 @@ export default function AddContact() {
       await addContactToList(email.trim());
       setEmail("");
     } catch {
-      // Error handled in ContactContext
     }
   };
 
   return (
-    <form onSubmit={addContact}>
-      <label>Contact Email:</label>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <button type="submit">Add Contact</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}{" "}
-      {/* NEW: Display errors */}
-    </form>
+    <div className="container mt-4">
+      <div className="card shadow">
+        <div className="card-header bg-primary text-white">
+          <h5 className="mb-0">Add New Contact</h5>
+        </div>
+        <div className="card-body">
+          <form onSubmit={addContact}>
+            <div className="mb-3">
+              <label htmlFor="contactEmail" className="form-label">
+                Contact Email:
+              </label>
+              <input
+                type="email"
+                id="contactEmail"
+                className="form-control"
+                placeholder="Enter contact email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn btn-success">
+              Add Contact
+            </button>
+
+            {error && (
+              <div className="alert alert-danger mt-3" role="alert">
+                {error}
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
+
+export default AddContact

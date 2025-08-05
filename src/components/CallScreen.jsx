@@ -4,7 +4,7 @@ import { CallContext } from "../context/CallContext.jsx";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { ContactContext } from "../context/ContactContext.jsx";
 
-export default function CallScreen() {
+ function CallScreen() {
   const { contactId } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -18,6 +18,7 @@ export default function CallScreen() {
     endCall,
     error,
   } = useContext(CallContext);
+
   const localRef = useRef();
   const remoteRef = useRef();
 
@@ -55,51 +56,32 @@ export default function CallScreen() {
     navigate(`/chat/${contactId}`);
   };
 
-  if (!user || !contactId) return <p>Loading...</p>;
+  if (!user || !contactId)
+    return <div className="text-center mt-5">Loading...</div>;
 
   return (
     <div
-      style={{
-        height: call.callType === "audio" ? "100vh" : "100vh",
-        background: call.callType === "audio" ? "transparent" : "#000",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      className={`d-flex justify-content-center align-items-center vh-100 ${
+        call.callType === "audio" ? "" : "bg-dark position-relative"
+      }`}
     >
       {error && (
-        <p style={{ color: "red", position: "absolute", top: 10, left: 10 }}>
+        <div className="alert alert-danger position-absolute top-0 start-0 m-3">
           {error}
-        </p>
+        </div>
       )}
+
       {call.callType === "audio" ? (
         <div
-          style={{
-            width: 200,
-            height: 100,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-around",
-            alignItems: "center",
-            border: "1px solid #ccc",
-            borderRadius: 5,
-            padding: "10px",
-          }}
+          className="card text-center shadow-sm p-3"
+          style={{ width: "250px" }}
         >
-          <h2 style={{ margin: 0 }}>{contactName}</h2>
-          <button
-            onClick={handleEndCall}
-            style={{
-              backgroundColor: "red",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: 5,
-              cursor: "pointer",
-            }}
-          >
-            End Call
-          </button>
+          <div className="card-body">
+            <h5 className="card-title">{contactName}</h5>
+            <button className="btn btn-danger mt-3" onClick={handleEndCall}>
+              End Call
+            </button>
+          </div>
         </div>
       ) : (
         <>
@@ -107,7 +89,7 @@ export default function CallScreen() {
             ref={remoteRef}
             autoPlay
             playsInline
-            style={{ width: "100%", height: "80%", objectFit: "cover" }}
+            className="w-100 h-100 object-fit-cover"
           />
           {localStream && (
             <video
@@ -115,28 +97,13 @@ export default function CallScreen() {
               autoPlay
               playsInline
               muted
-              style={{
-                position: "absolute",
-                bottom: 10,
-                right: 10,
-                width: 200,
-                border: "2px solid white",
-              }}
+              className="position-absolute border border-white rounded"
+              style={{ width: "200px", bottom: "10px", right: "10px" }}
             />
           )}
           <button
+            className="btn btn-danger position-absolute top-0 end-0 m-3"
             onClick={handleEndCall}
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "red",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: 5,
-              cursor: "pointer",
-            }}
           >
             End Call
           </button>
@@ -145,3 +112,5 @@ export default function CallScreen() {
     </div>
   );
 }
+
+export default CallScreen

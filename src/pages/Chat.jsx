@@ -7,14 +7,14 @@ import api from "../services/api.js";
 import ChatBox from "../components/Chat/ChatBox.jsx";
 import useWebSocket from "../hooks/useWebSocket.jsx";
 
-export default function Chat() {
+function Chat() {
   const { contactId } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { callUser, error: callError } = useContext(CallContext); // CHANGED: Use call error
+  const { callUser, error: callError } = useContext(CallContext);
   const { messages, setMessages } = useContext(ChatContext);
   const [input, setInput] = useState("");
-  const [error, setError] = useState(""); // NEW: Added error state
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchMessages() {
@@ -69,32 +69,40 @@ export default function Chat() {
     navigate(`/call/${contactId}`);
   };
 
-  if (!user || !contactId) return <p>Loading...</p>;
+  if (!user || !contactId)
+    return <p className="text-center mt-4">Loading...</p>;
 
   return (
-    <div>
+    <div className="container my-4">
       {(error || callError) && (
-        <p style={{ color: "red" }}>{error || callError}</p>
-      )}{" "}
-      {/* NEW: Display errors */}
+        <div className="alert alert-danger">{error || callError}</div>
+      )}
+
       <ChatBox messages={messages} currentUserId={user._id} />
-      <div style={{ display: "flex", marginTop: 10 }}>
+
+      <div className="d-flex mt-3">
         <input
-          style={{ flex: 1 }}
           type="text"
+          className="form-control me-2"
           placeholder="Type a message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
-        <button onClick={sendMessage} style={{ marginLeft: 5 }}>
+        <button className="btn btn-primary" onClick={sendMessage}>
           Send
         </button>
       </div>
-      <div style={{ marginTop: 10 }}>
-        <button onClick={() => handleStartCall(true)}>Video Call</button>
+
+      <div className="mt-3 d-flex gap-2">
         <button
+          className="btn btn-success"
+          onClick={() => handleStartCall(true)}
+        >
+          Video Call
+        </button>
+        <button
+          className="btn btn-secondary"
           onClick={() => handleStartCall(false)}
-          style={{ marginLeft: 5 }}
         >
           Audio Call
         </button>
@@ -102,3 +110,5 @@ export default function Chat() {
     </div>
   );
 }
+
+export default Chat

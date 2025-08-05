@@ -22,7 +22,7 @@ export const CallProvider = ({ children }) => {
       socket.connect();
       socket.emit("register", user._id, (response) => {
         if (response?.error) {
-          setError(response.error); // NEW: Handle socket registration errors
+          setError(response.error);
         }
       });
     }
@@ -38,7 +38,7 @@ export const CallProvider = ({ children }) => {
 
     socket.on("call:ended", () => endCall());
 
-    // NEW: Handle socket connection errors
+
     socket.on("connectionError", (message) => {
       setError(`Socket error: ${message}`);
     });
@@ -48,7 +48,6 @@ export const CallProvider = ({ children }) => {
       socket.off("call:accepted");
       socket.off("call:ended");
       socket.off("connectionError");
-      // CHANGED: Move cleanup to endCall to avoid duplication
     };
   }, [user?._id]);
 

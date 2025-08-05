@@ -30,30 +30,64 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          onChange={handleChange}
-          value={formData.email}
-          placeholder="Email"
-          required
-        />
-        <input
-          name="password"
-          onChange={handleChange}
-          value={formData.password}
-          type="password"
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <p>
-          No account? <Link to="/register">Register</Link>
-        </p>
-      </form>
+    <div className="container d-flex justify-content-center align-items-center vh-100">
+      <div
+        className="card p-4 shadow-lg"
+        style={{ maxWidth: "400px", width: "100%" }}
+      >
+        <h2 className="text-center text-primary mb-4">Login</h2>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              className="form-control"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              className="form-control"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary w-100">
+            Login
+          </button>
+
+          <p className="mt-3 text-center">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-decoration-none text-success">
+              Register
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };
