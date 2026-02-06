@@ -1,12 +1,57 @@
-# React + Vite
+## 📌 Project Description
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Chat Application Frontend is a modern, responsive web interface built using React.js that allows users to communicate in real time.
 
-Currently, two official plugins are available:
+It provides an intuitive user experience for:
+- User authentication
+- Contact management using email IDs
+- Real-time message sending and receiving
+- Automatic message updates without page refresh
+- Seamless interaction with the backend via APIs and sockets
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The frontend communicates with the backend using Axios for REST APIs and Socket.IO Client for real-time messaging.
 
-## Expanding the ESLint configuration
+-------------------------------------------------------------------------------------------------------------------------------------------------
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Technologies Used
+
+- React.js – UI library
+- Vite** – Fast development & build tool
+- React Router DOM – Client-side routing
+- Axios – API communication
+- Socket.IO Client – Real-time messaging
+- Bootstrap – Responsive UI styling
+- Simple-Peer – Peer-to-peer communication support
+- Netlify / Vercel – Frontend deployment
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+ Purpose of the Project
+
+This frontend was created to:
+- Build a real-time interactive UI
+- Handle live socket connections in React
+- Manage authentication state securely
+- Practice scalable component-based architecture
+- Integrate REST APIs with WebSocket events
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+ Key Features
+
+- Secure login and registration
+- Add contacts using email ID
+- Real-time chat updates
+- Auto-display new messages instantly
+- Clean and responsive UI
+- Persistent chat conversations
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+ Real-World Use Cases
+
+- Messaging applications
+- Collaboration tools
+- Social chat platforms
+- Customer support dashboards
+- Portfolio project for frontend and full-stack roles
