@@ -1,4 +1,4 @@
-## 📌 Project Description
+ Project Description
 
 The Chat Application Frontend is a modern, responsive web interface built using React.js that allows users to communicate in real time.
 
@@ -13,7 +13,7 @@ The frontend communicates with the backend using Axios for REST APIs and Socket.
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
-## 🛠️ Technologies Used
+ Technologies Used
 
 - React.js – UI library
 - Vite** – Fast development & build tool
@@ -25,8 +25,7 @@ The frontend communicates with the backend using Axios for REST APIs and Socket.
 - Netlify / Vercel – Frontend deployment
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
-
- Purpose of the Project
+Purpose of the Project
 
 This frontend was created to:
 - Build a real-time interactive UI
