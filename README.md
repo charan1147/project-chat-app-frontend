@@ -1,4 +1,4 @@
- Project Description
+Project Description
 
 The Chat Application Frontend is a modern, responsive web interface built using React.js that allows users to communicate in real time.
 
